@@ -1,12 +1,5 @@
-import * as readline from "readline";
-import { commandExit } from "./command_exit.js";
-import { commandHelp } from "./command_help.js";
+import { State } from "./state.js";
 
-export type CLICommand = {
-    name: string;
-    description: string;
-    callback: (commands: Record<string, CLICommand>) => void;
-};
 
 export function cleanInput(input: string): string[] {
     const lowerInput = input.toLowerCase();
@@ -14,17 +7,13 @@ export function cleanInput(input: string): string[] {
     return word;
 }
 
-export function startREPL() {
-    const read = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: "Pokedex > ",
-});
+export function startREPL(state: State) {
+    const read = state.readline;
+    const commands = state.commands;
 
-const commands = getCommand();
+    read.prompt();
 
-read.prompt();
-read.on("line", (line: string) => {
+    read.on("line", (line: string) => {
     const words = cleanInput(line);
     if (words.length === 0) {
         read.prompt();
@@ -32,11 +21,11 @@ read.on("line", (line: string) => {
     }
 
     const commandName = words[0];
-    const command = commands[commandName];
+    const command = state.commands[commandName];
 
     if (command) {
         try {
-            command.callback(commands);
+            command.callback(state);
         } catch (err) {
             console.error("Error running command: ", err);
         }
@@ -46,19 +35,4 @@ read.on("line", (line: string) => {
 
     read.prompt();
 })
-}
-
-export function getCommand(): Record<string, CLICommand> {
-    return {
-        exit: {
-            name: "exit",
-            description: "Exits the pokedex",
-            callback: commandExit,
-        },
-        help: {
-            name: "help",
-            description: "Displays a help message",
-            callback: commandHelp,
-        },
-    }
 }
