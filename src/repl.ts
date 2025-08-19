@@ -1,4 +1,12 @@
 import * as readline from "readline";
+import { commandExit } from "./command_exit.js";
+import { commandHelp } from "./command_help.js";
+
+export type CLICommand = {
+    name: string;
+    description: string;
+    callback: (commands: Record<string, CLICommand>) => void;
+};
 
 export function cleanInput(input: string): string[] {
     const lowerInput = input.toLowerCase();
@@ -12,6 +20,9 @@ export function startREPL() {
     output: process.stdout,
     prompt: "Pokedex > ",
 });
+
+const commands = getCommand();
+
 read.prompt();
 read.on("line", (line: string) => {
     const words = cleanInput(line);
@@ -19,7 +30,35 @@ read.on("line", (line: string) => {
         read.prompt();
         return;
     }
-    console.log(`Your command was: ${words[0]}`);
+
+    const commandName = words[0];
+    const command = commands[commandName];
+
+    if (command) {
+        try {
+            command.callback(commands);
+        } catch (err) {
+            console.error("Error running command: ", err);
+        }
+    } else {
+        console.log("Unknown command");
+    }
+
     read.prompt();
 })
+}
+
+export function getCommand(): Record<string, CLICommand> {
+    return {
+        exit: {
+            name: "exit",
+            description: "Exits the pokedex",
+            callback: commandExit,
+        },
+        help: {
+            name: "help",
+            description: "Displays a help message",
+            callback: commandHelp,
+        },
+    }
 }

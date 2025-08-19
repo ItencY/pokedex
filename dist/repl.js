@@ -1,4 +1,6 @@
 import * as readline from "readline";
+import { commandExit } from "./command_exit.js";
+import { commandHelp } from "./command_help.js";
 export function cleanInput(input) {
     const lowerInput = input.toLowerCase();
     const word = lowerInput.split(/\s+/).filter(word => word !== "");
@@ -10,6 +12,7 @@ export function startREPL() {
         output: process.stdout,
         prompt: "Pokedex > ",
     });
+    const commands = getCommand();
     read.prompt();
     read.on("line", (line) => {
         const words = cleanInput(line);
@@ -17,7 +20,33 @@ export function startREPL() {
             read.prompt();
             return;
         }
-        console.log(`Your command was: ${words[0]}`);
+        const commandName = words[0];
+        const command = commands[commandName];
+        if (command) {
+            try {
+                command.callback(commands);
+            }
+            catch (err) {
+                console.error("Error running command: ", err);
+            }
+        }
+        else {
+            console.log("Unknown command");
+        }
         read.prompt();
     });
+}
+export function getCommand() {
+    return {
+        exit: {
+            name: "exit",
+            description: "Exits the pokedex",
+            callback: commandExit,
+        },
+        help: {
+            name: "help",
+            description: "Displays a help message",
+            callback: commandHelp,
+        },
+    };
 }
