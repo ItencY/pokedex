@@ -3,21 +3,21 @@ export function cleanInput(input) {
     const word = lowerInput.split(/\s+/).filter(word => word !== "");
     return word;
 }
-export function startREPL(state) {
+export async function startREPL(state) {
     const read = state.readline;
-    const commands = state.commands;
     read.prompt();
-    read.on("line", (line) => {
+    read.on("line", async (line) => {
         const words = cleanInput(line);
         if (words.length === 0) {
             read.prompt();
             return;
         }
         const commandName = words[0];
+        const args = words.slice(1);
         const command = state.commands[commandName];
         if (command) {
             try {
-                command.callback(state);
+                command.callback(state, ...args);
             }
             catch (err) {
                 console.error("Error running command: ", err);
