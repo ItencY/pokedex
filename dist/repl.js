@@ -14,7 +14,7 @@ export function startREPL(state) {
             return;
         }
         const commandName = words[0];
-        const command = commands[commandName];
+        const command = state.commands[commandName];
         if (command) {
             try {
                 command.callback(state);
