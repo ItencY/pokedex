@@ -1,3 +1,4 @@
+import { commandInspect } from "./ccommand_inspect.js";
 import { commandCatch } from "./command_catch.js";
 import { commandExit } from "./command_exit.js";
 import { commandExplore } from "./command_explore.js";
@@ -37,5 +38,10 @@ export function getCommand(): Record<string, CLICommand> {
             description: "Attempt to catch a pokemon",
             callback: commandCatch,
         },
-    }
+        inspect: {
+            name: "inspect <pokemon_name>",
+            description: "View details about a caught pokemon",
+            callback: commandInspect,
+        },
+    };
 }
