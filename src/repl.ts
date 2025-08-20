@@ -7,13 +7,12 @@ export function cleanInput(input: string): string[] {
     return word;
 }
 
-export function startREPL(state: State) {
+export async function startREPL(state: State) {
     const read = state.readline;
-    const commands = state.commands;
 
     read.prompt();
 
-    read.on("line", (line: string) => {
+    read.on("line", async (line: string) => {
     const words = cleanInput(line);
     if (words.length === 0) {
         read.prompt();

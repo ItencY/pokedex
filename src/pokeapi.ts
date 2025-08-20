@@ -8,22 +8,32 @@ export class PokeAPI {
         
         try {
             const response = await fetch(url);
+
+            if (!response.ok) {
+              throw new Error(`${response.status} ${response.statusText}`);
+            }
+
             const locations: ShallowLocations = await response.json();
             return locations;
         } catch (err) {
-            throw new Error(`Error fetching locations: ${err}`);
+          throw new Error(`Error fetching locations: ${(err as Error).message}`);
         }
     }
 
     async fetchLocation(locationName: string): Promise<Location> {
-        const url = locationName || `${PokeAPI.baseURL}/location-area/${locationName}`;
+        const url = `${PokeAPI.baseURL}/location-area/${locationName}`;
 
         try {
             const response = await fetch(url);
+
+            if (!response.ok) {
+              throw new Error(`${response.status} ${response.statusText}`);
+            }
+
             const location: Location = await response.json();
             return location;
         } catch (err) {
-            throw new Error(`Error fecthing location: ${err}`);
+          throw new Error(`Error fecthing location: ${(err as Error).message}`);
         }
     }
 }
